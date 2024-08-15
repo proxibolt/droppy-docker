@@ -1,0 +1,39 @@
+version: '3'
+services:
+  apache:
+    image: webdevops/php-apache:8.2
+    container_name: droppy
+    depends_on:
+      - 'db'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./web:/app
+    restart: unless-stopped
+    environment:
+      - PHP_POST_MAX_SIZE=100M
+      - PHP_UPLOAD_MAX_FILESIZE=100M
+      - PHP_MEMORY_LIMIT=265M
+      - PHP_MAX_EXECUTION_TIME=3600
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'droppy'
+      MYSQL_USER: 'droppy'
+      MYSQL_PASSWORD: "mysql-password-here"
+      MYSQL_ROOT_PASSWORD: "mysql-root-password-here"
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./mysql:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: 'db'
+    ports:
+      - '8586:80'
